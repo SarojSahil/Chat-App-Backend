@@ -1,11 +1,15 @@
 spring:
   application:
     name: chatapp
-  datasource:
-    url: jdbc:h2:file:./application_db
-    username: sa
-    password:
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: update
-    show-sql: true
+    open-in-view: false
+  datasource:
+    url: jdbc:h2:file:./chatapp
+    username: sa
+    password: 
+jwt:
+  secret: gJafYk4gVrg2oc2A2KcitdgwRjQJgI7uqR9lHD_mvjc
+  
