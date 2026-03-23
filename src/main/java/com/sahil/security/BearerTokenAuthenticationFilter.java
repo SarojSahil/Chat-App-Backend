@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public BearerTokenAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
@@ -37,18 +37,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             Claims claims = jwtService.verifyToken(token);
 
-            String username = claims.getSubject();
-            List<String> scopes = claims.get("scope", ArrayList.class);
-            List<? extends GrantedAuthority> authorities = scopes.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .toList();
+            if (claims != null) {
+                String username = claims.getSubject();
+                List<String> scopes = claims.get("scope", ArrayList.class);
+                List<? extends GrantedAuthority> authorities = scopes.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .toList();
 
-            UsernamePasswordAuthenticationToken authentication = UsernamePasswordAuthenticationToken
-                    .authenticated(username, null, authorities);
+                UsernamePasswordAuthenticationToken authentication = UsernamePasswordAuthenticationToken
+                        .authenticated(username, null, authorities);
 
-            authentication.setDetails(new WebAuthenticationDetails(request));
+                authentication.setDetails(new WebAuthenticationDetails(request));
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         filterChain.doFilter(request, response);
     }

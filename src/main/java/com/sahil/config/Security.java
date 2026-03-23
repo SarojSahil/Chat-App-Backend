@@ -1,7 +1,8 @@
 package com.sahil.config;
 
-import com.sahil.security.JwtAuthenticationFilter;
-
+import com.sahil.exception.handler.BearerTokenAuthenticationEntryPoint;
+import com.sahil.exception.handler.CustomAccessDeniedHandler;
+import com.sahil.security.BearerTokenAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,14 +14,23 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class Security {
 
-    private final JwtAuthenticationFilter authenticationFilter;
+    private final BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter;
+    private final BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public Security(JwtAuthenticationFilter filter) {
-        this.authenticationFilter = filter;
+    public Security(BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter, BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
+        this.bearerTokenAuthenticationFilter = bearerTokenAuthenticationFilter;
+        this.bearerTokenAuthenticationEntryPoint = bearerTokenAuthenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -29,20 +39,38 @@ public class Security {
     }
 
     @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     SecurityFilterChain filterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(this.authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(this.bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .exceptionHandling(ex ->
+                        ex.authenticationEntryPoint(bearerTokenAuthenticationEntryPoint)
+                                .accessDeniedHandler(customAccessDeniedHandler)
+                )
                 .authorizeHttpRequests(auth ->
-                    auth.requestMatchers("/auth/**").permitAll()
-                            .anyRequest().authenticated()
+                        auth.requestMatchers("/auth/**", "/ws").permitAll()
+                                .anyRequest().authenticated()
                 );
         return http.build();
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

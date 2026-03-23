@@ -7,6 +7,7 @@ import com.sahil.model.User;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @NoArgsConstructor
 @Data

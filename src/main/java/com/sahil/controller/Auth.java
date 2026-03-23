@@ -1,29 +1,23 @@
 package com.sahil.controller;
 
-import com.sahil.dto.LoginRequest;
-import com.sahil.dto.LoginResponse;
-import com.sahil.dto.RegisterRequest;
-import com.sahil.dto.RegisterResponse;
-import com.sahil.dto.UserDto;
+import com.sahil.dto.*;
+import com.sahil.exception.UserAlreadyExistsException;
 import com.sahil.model.Authority;
 import com.sahil.model.User;
 import com.sahil.service.JwtService;
 import com.sahil.service.UserService;
-
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/auth")
@@ -42,23 +36,36 @@ public class Auth {
     }
 
     @GetMapping("/users")
-    public List<UserDto> findAllUsers() {
+    public ResponseEntity<List<UserDto>> findAllUsers() {
         List<User> users = userService.findAllUsers();
-        return users.stream().map(UserDto::new).toList();
+        List<UserDto> userDtos = users.stream().map(UserDto::new).toList();
+        return ResponseEntity.ok(userDtos);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> me(@AuthenticationPrincipal String username) {
+        User user = userService.loadUserByUsername(username);
+        UserDto userDto = new UserDto(user);
+        return ResponseEntity.ok(userDto);
     }
 
     @PostMapping("/register")
     ResponseEntity<RegisterResponse> register(@RequestBody @Valid RegisterRequest request) {
 
-        boolean userExists = userService.userExistsByUsername(request.getUsername());
+        boolean exists = userService.userExistsByUsername(request.getUsername());
 
-        if (userExists) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (exists) {
+            throw new UserAlreadyExistsException("User Already Exists.");
         }
 
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
-        User user = new User(null, request.getUsername(), hashedPassword, List.of(Authority.ROLE_USER));
+        User user = User
+                .builder()
+                .username(request.getUsername())
+                .password(hashedPassword)
+                .authorities(List.of(Authority.ROLE_USER))
+                .build();
 
         userService.saveUser(user);
 
