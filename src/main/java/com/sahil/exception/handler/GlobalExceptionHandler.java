@@ -2,6 +2,7 @@ package com.sahil.exception.handler;
 
 import com.sahil.dto.ErrorResponse;
 import com.sahil.exception.UserAlreadyExistsException;
+import com.sahil.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,17 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURL().toString())
                 .build();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> userNotFound(HttpServletRequest request, UserNotFoundException ex) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .path(request.getRequestURL().toString())
+                .status(HttpStatus.NOT_FOUND)
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -64,7 +76,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> HttpMessageNotReadable(HttpServletRequest request, HttpMessageNotReadableException ex) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .path("Required Request Payload Is Missing.")
+                .path(request.getRequestURL().toString())
                 .message(ex.getMessage())
                 .status(HttpStatus.BAD_REQUEST)
                 .build();

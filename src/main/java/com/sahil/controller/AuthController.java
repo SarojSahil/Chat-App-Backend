@@ -7,28 +7,29 @@ import com.sahil.model.User;
 import com.sahil.service.JwtService;
 import com.sahil.service.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/auth")
-public class Auth {
+@Slf4j
+public class AuthController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
-    public Auth(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
+    public AuthController(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
@@ -38,14 +39,19 @@ public class Auth {
     @GetMapping("/users")
     public ResponseEntity<List<UserDto>> findAllUsers() {
         List<User> users = userService.findAllUsers();
-        List<UserDto> userDtos = users.stream().map(UserDto::new).toList();
-        return ResponseEntity.ok(userDtos);
+
+        List<UserDto> userDto = users.stream().map(UserDto::new).toList();
+
+        return ResponseEntity.ok(userDto);
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDto> me(@AuthenticationPrincipal String username) {
-        User user = userService.loadUserByUsername(username);
+    public ResponseEntity<UserDto> me(@AuthenticationPrincipal User user) {
+
         UserDto userDto = new UserDto(user);
+
+        log.info("Profile Fetched By: {}", user.getUsername());
+
         return ResponseEntity.ok(userDto);
     }
 
@@ -64,12 +70,14 @@ public class Auth {
                 .builder()
                 .username(request.getUsername())
                 .password(hashedPassword)
-                .authorities(List.of(Authority.ROLE_USER))
+                .authorities(Set.of(Authority.ROLE_USER))
                 .build();
 
-        userService.saveUser(user);
+        User userCreated = userService.saveUser(user);
 
-        String token = jwtService.grantToken(user.getUsername(), user.getAuthorities());
+        String token = jwtService.grantToken(userCreated);
+
+        log.info("User Registered With Username: {}", user.getUsername());
 
         return ResponseEntity.ok(new RegisterResponse(token));
     }
@@ -78,9 +86,14 @@ public class Auth {
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
         UsernamePasswordAuthenticationToken unauthenticated = UsernamePasswordAuthenticationToken
                 .unauthenticated(request.getUsername(), request.getPassword());
-        Authentication authenticated = authenticationManager.authenticate(unauthenticated);
 
-        String token = jwtService.grantToken(authenticated.getName(), authenticated.getAuthorities());
+        Authentication result = authenticationManager.authenticate(unauthenticated);
+
+        User user = (User) result.getPrincipal();
+
+        String token = jwtService.grantToken(user);
+
+        log.info("User Logged In With Username: {}", user.getUsername());
 
         return ResponseEntity.ok(new LoginResponse(token));
     }

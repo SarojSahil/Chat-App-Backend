@@ -1,5 +1,7 @@
 package com.sahil.security;
 
+import com.sahil.model.Authority;
+import com.sahil.model.User;
 import com.sahil.service.JwtService;
 import io.jsonwebtoken.Claims;
 import org.jspecify.annotations.Nullable;
@@ -13,7 +15,10 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class StompJwtInterceptor implements ChannelInterceptor {
@@ -36,10 +41,20 @@ public class StompJwtInterceptor implements ChannelInterceptor {
                 if (claims == null) {
                     throw new MessageDeliveryException("Invalid Token Presented.");
                 }
-
                 String username = claims.getSubject();
-                accessor.setUser(new UsernamePasswordAuthenticationToken(username, null, null));
+                Long userId = claims.get("userId", Long.class);
+                List<String> roles = claims.get("roles", ArrayList.class);
+                Set<Authority> authorities = roles.stream()
+                        .map(Authority::valueOf)
+                        .collect(Collectors.toSet());
 
+                User user = User.builder()
+                        .id(userId)
+                        .username(username)
+                        .authorities(authorities)
+                        .build();
+
+                accessor.setUser(UsernamePasswordAuthenticationToken.authenticated(user, null, user.getAuthorities()));
             }
         }
         return message;

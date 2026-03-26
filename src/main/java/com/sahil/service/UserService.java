@@ -3,8 +3,7 @@ package com.sahil.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.sahil.exception.UserAlreadyExistsException;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.sahil.exception.UserNotFoundException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -30,6 +29,14 @@ public class UserService implements UserDetailsService {
         throw new UsernameNotFoundException("User does not exists.");
     }
 
+    public User findUserById(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        }
+        throw new UserNotFoundException("User Does Not Exists.");
+    }
+
     public boolean userExistsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
@@ -38,7 +45,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 }

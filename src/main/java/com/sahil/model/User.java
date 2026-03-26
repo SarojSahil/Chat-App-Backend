@@ -1,5 +1,6 @@
 package com.sahil.model;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
@@ -46,12 +48,23 @@ public class User implements UserDetails {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
-    private List<Authority> authorities;
+    private Set<Authority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities.stream()
                 .map(Authority -> new SimpleGrantedAuthority(Authority.name()))
+                .collect(Collectors.toSet());
+    }
+
+    @JsonSetter
+    public void setAuthority(Set<Authority> authorities) {
+        this.authorities = authorities;
+    }
+
+    public void setAuthority(List<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities.stream()
+                .map(authority -> Authority.valueOf(authority.getAuthority()))
                 .collect(Collectors.toSet());
     }
 }
