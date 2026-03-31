@@ -22,4 +22,6 @@ public class Message {
     private Long senderId;
     private Long receiverId;
     private LocalDateTime timestamp;
+    @Enumerated(EnumType.STRING)
+    private MessageStatus status;
 }

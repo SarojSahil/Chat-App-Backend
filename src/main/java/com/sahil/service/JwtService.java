@@ -5,16 +5,12 @@ import com.sahil.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -25,7 +21,7 @@ public class  JwtService {
     private final SecretKey key;
 
     public JwtService(@Value("${jwt.secret}") String secret) {
-        this.key = new SecretKeySpec(Decoders.BASE64URL.decode(secret), "HmacSha256");
+        this.key = new SecretKeySpec(secret.getBytes(), "HmacSha256");
     }
 
     public String grantToken(User user) {

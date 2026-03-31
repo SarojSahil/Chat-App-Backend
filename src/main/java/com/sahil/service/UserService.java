@@ -45,6 +45,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    public List<User> findAllUsersWhereIdIn(List<Long> id) {
+        return userRepository.findByIdIn(id);
+    }
+
     public User saveUser(User user) {
         return userRepository.save(user);
     }
