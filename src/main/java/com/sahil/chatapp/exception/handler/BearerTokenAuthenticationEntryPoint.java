@@ -37,6 +37,7 @@ public class BearerTokenAuthenticationEntryPoint implements AuthenticationEntryP
         if (authException instanceof BadCredentialsException) {
             errorResponse.setStatus(HttpStatus.BAD_REQUEST);
             errorResponse.setMessage("Invalid Phone Number Or Password.");
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
         objectMapper.writeValue(response.getWriter(), errorResponse);
     }

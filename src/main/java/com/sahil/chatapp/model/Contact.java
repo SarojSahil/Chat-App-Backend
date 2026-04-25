@@ -1,34 +1,40 @@
 package com.sahil.chatapp.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 
 @Builder
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "contact")
+@Setter
+@Getter
+@DynamicUpdate
+@Table(
+        name = "contact",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_owner_&_contact_user",
+                columnNames = {"owner_id", "contact_user_id"}
+        )
+)
 public class Contact {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contact_user_id")
     private User contactUser;
 
     private String name;
 
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 }

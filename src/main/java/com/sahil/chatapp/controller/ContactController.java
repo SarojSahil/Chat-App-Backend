@@ -7,6 +7,7 @@ import com.sahil.chatapp.dto.ContactUpdateRequest;
 import com.sahil.chatapp.model.User;
 import com.sahil.chatapp.service.ContactService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Null;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,17 +27,16 @@ public class ContactController {
 
     @GetMapping
     public ResponseEntity<List<ContactResponse>> getContacts(@AuthenticationPrincipal User user) {
-        List<ContactResponse> contacts = contactService.getUserContacts(user);
-        return ResponseEntity.ok(contacts);
+        return ResponseEntity.ok(contactService.getContacts(user));
     }
 
     @PostMapping
-    public ResponseEntity<ContactResponse> saveContact(@AuthenticationPrincipal User user, @RequestBody @Valid ContactSaveRequest request) {
-        ContactResponse savedContact = contactService.saveUserContact(user, request);
+    public ResponseEntity<ContactResponse> createContact(@AuthenticationPrincipal User user, @RequestBody @Valid ContactSaveRequest request) {
+        ContactResponse savedContact = contactService.createContact(user, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedContact);
     }
 
-    @DeleteMapping
+    @DeleteMapping()
     public ResponseEntity<?> deleteContact(@AuthenticationPrincipal User user, @RequestBody @Valid ContactDeleteRequest request) {
         contactService.deleteContact(user, request);
         return ResponseEntity.noContent().build();

@@ -1,19 +1,17 @@
 package com.sahil.chatapp.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
-public class ContactResponse {
+public class ConversationResponse {
     private Long id;
-    private String name;
-    private ContactUser user;
+    private UserResponse otherPerson;
 
-    @Getter
     @Builder
-    public static class ContactUser {
+    @Getter
+    public static class UserResponse {
         private Long id;
         private String name;
         private String phoneNumber;

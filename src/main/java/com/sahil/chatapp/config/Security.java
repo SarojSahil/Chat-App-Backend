@@ -55,7 +55,7 @@ public class    Security {
                                 .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**").permitAll()
+                        auth.requestMatchers("/api/auth/**", "/ws").permitAll()
                                 .anyRequest().authenticated()
                 );
         return http.build();

@@ -42,9 +42,13 @@ public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
             if (claims != null) {
                 Long userId = Long.parseLong(claims.getSubject());
                 SystemRole role = SystemRole.valueOf(claims.get("role", String.class));
+                String name = claims.get("name", String.class);
+                String phoneNumber = claims.get("phoneNumber", String.class);
 
                 User user = User.builder()
                         .id(userId)
+                        .name(name)
+                        .phoneNumber(phoneNumber)
                         .role(role)
                         .build();
 

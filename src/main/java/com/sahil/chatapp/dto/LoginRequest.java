@@ -5,8 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
 public class LoginRequest {
     @NotBlank(message = "Phone number cannot be blank.")
     @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits.")
