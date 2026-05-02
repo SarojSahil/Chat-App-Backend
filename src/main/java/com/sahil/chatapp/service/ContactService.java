@@ -95,7 +95,7 @@ public class ContactService {
 
     @Transactional
     public void deleteContact(User user, ContactDeleteRequest request) {
-        int modified = contactRepository.deleteByIdAndOwnerId(request.getId(), user.getId());
+        int modified = contactRepository.deleteByIdAndOwnerId(request.getContactId(), user.getId());
         if (modified == 0) {
             throw new ContactNotFoundException("Contact does not exist.");
         }

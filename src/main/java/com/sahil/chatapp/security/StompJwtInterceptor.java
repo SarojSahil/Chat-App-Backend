@@ -1,8 +1,6 @@
 package com.sahil.chatapp.security;
 
 import com.sahil.chatapp.model.StompPrincipal;
-import com.sahil.chatapp.model.SystemRole;
-import com.sahil.chatapp.model.User;
 import com.sahil.chatapp.service.JwtService;
 import io.jsonwebtoken.Claims;
 import org.jspecify.annotations.Nullable;
@@ -13,14 +11,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
-
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class StompJwtInterceptor implements ChannelInterceptor {
@@ -44,8 +35,17 @@ public class StompJwtInterceptor implements ChannelInterceptor {
                     throw new MessageDeliveryException("Invalid Token Presented.");
                 }
                 Long userId = Long.parseLong(claims.getSubject());
+                String name = claims.get("name", String.class);
+                String phoneNumber = claims.get("phoneNumber", String.class);
 
-                accessor.setUser(new StompPrincipal(userId));
+                StompPrincipal principal = StompPrincipal
+                        .builder()
+                        .userId(userId)
+                        .username(name)
+                        .phoneNumber(phoneNumber)
+                        .build();
+
+                accessor.setUser(principal);
             }
         }
         return message;
