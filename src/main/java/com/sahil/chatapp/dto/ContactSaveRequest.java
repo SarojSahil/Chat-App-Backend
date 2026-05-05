@@ -15,5 +15,5 @@ public class ContactSaveRequest {
 
     @NotBlank(message = "Name cannot be blank.")
     @Size(min = 2, max = 20, message = "Name should have minimum 2 and maximum 20 characters.")
-    private String name;
+    private String contactName;
 }

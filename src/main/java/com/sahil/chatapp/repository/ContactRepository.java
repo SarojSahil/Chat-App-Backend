@@ -20,7 +20,8 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
                 c.name AS name,
                 cu.id AS userId,
                 cu.name AS userName,
-                cu.phoneNumber AS userPhoneNumber
+                cu.phoneNumber AS userPhoneNumber,
+                cu.profilePictureUrl AS userProfilePictureUrl
             FROM
                 Contact c
             JOIN
@@ -36,6 +37,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
         Long getUserId();
         String getUserName();
         String getUserPhoneNumber();
+        String getUserProfilePictureUrl();
     }
 
     @Query("""

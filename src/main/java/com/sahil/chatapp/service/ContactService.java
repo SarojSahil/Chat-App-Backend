@@ -13,9 +13,12 @@ import com.sahil.chatapp.repository.ContactRepository;
 import com.sahil.chatapp.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,13 +50,13 @@ public class ContactService {
                                         .id(projection.getUserId())
                                         .name(projection.getUserName())
                                         .phoneNumber(projection.getUserPhoneNumber())
+                                        .profilePictureUrl(projection.getUserProfilePictureUrl())
                                         .build())
                                 .build()
                 )
                 .toList();
     }
 
-    @Transactional
     public ContactResponse createContact(User user, ContactSaveRequest request) {
 
         String phone = request.getPhoneNumber();
@@ -70,7 +73,7 @@ public class ContactService {
         Contact contact = Contact.builder()
                 .owner(user)
                 .contactUser(contactUser)
-                .name(request.getName().trim())
+                .name(request.getContactName().trim())
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -86,9 +89,10 @@ public class ContactService {
                             .id(result.getId())
                             .name(result.getName())
                             .phoneNumber(result.getPhoneNumber())
+                            .profilePictureUrl(result.getProfilePictureUrl())
                             .build())
                     .build();
-        } catch (Exception e) {
+        } catch (DataIntegrityViolationException e) {
             throw new ContactAlreadyExistsException("Contact already exists.");
         }
     }
@@ -118,6 +122,7 @@ public class ContactService {
                         .id(contact.getContactUser().getId())
                         .name(contact.getContactUser().getName())
                         .phoneNumber(contact.getContactUser().getPhoneNumber())
+                        .profilePictureUrl(contact.getContactUser().getProfilePictureUrl())
                         .build())
                 .build();
     }

@@ -17,5 +17,6 @@ public class ContactResponse {
         private Long id;
         private String name;
         private String phoneNumber;
+        private String profilePictureUrl;
     }
 }

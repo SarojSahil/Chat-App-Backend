@@ -4,7 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Service;
 
+@Setter
 @Getter
 public class RegisterRequest {
     @NotBlank(message = "Phone number cannot be blank.")

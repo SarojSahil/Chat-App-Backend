@@ -19,5 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
         Long getId();
         String getName();
         String getPhoneNumber();
+        String getProfilePictureUrl();
     }
 }

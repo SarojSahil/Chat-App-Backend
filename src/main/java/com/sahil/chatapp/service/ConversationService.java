@@ -121,12 +121,14 @@ public class ConversationService {
         return ConversationResponse
                 .builder()
                 .id(conversation.getId())
+                .createdAt(conversation.getCreatedAt())
                 .otherPerson(
                         ConversationResponse.UserResponse
                                 .builder()
                                 .id(otherPerson.getId())
                                 .name(otherPerson.getName())
                                 .phoneNumber(otherPerson.getPhoneNumber())
+                                .profilePictureUrl(otherPerson.getProfilePictureUrl())
                                 .build()
                 )
                 .build();
