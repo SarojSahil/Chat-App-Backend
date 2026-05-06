@@ -1,6 +1,8 @@
 package com.sahil.chatapp.dto;
 
+import com.sahil.chatapp.model.MessageType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,4 +14,6 @@ public class MessageSendRequest {
     private String content;
     private Long conversationId;
     private Long receiverId;
+    @NotNull
+    private MessageType type;
 }

@@ -68,6 +68,7 @@ public class ConversationService {
                 .conversation(conversation)
                 .sender(sender)
                 .content(request.getContent())
+                .type(request.getType())
                 .build();
 
         messageRepository.save(message);
@@ -79,6 +80,7 @@ public class ConversationService {
                 .senderId(message.getSender().getId())
                 .content(message.getContent())
                 .createdAt(message.getCreatedAt())
+                .type(message.getType())
                 .build();
 
         simpMessagingTemplate.convertAndSendToUser(conversation.getUserOne().getId().toString(), "/queue/message", messageResponse);

@@ -1,5 +1,6 @@
 package com.sahil.chatapp.dto;
 
+import com.sahil.chatapp.model.MessageType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,4 +14,5 @@ public class MessageResponse {
     private Long senderId;
     private String content;
     private LocalDateTime createdAt;
+    private MessageType type;
 }

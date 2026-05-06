@@ -1,7 +1,7 @@
 package com.sahil.chatapp.repository;
 
 import com.sahil.chatapp.model.Message;
-import org.springframework.boot.data.autoconfigure.web.DataWebProperties;
+import com.sahil.chatapp.model.MessageType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,7 +20,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
                 m.content AS content,
                 m.conversation.id AS conversationId,
                 m.sender.id AS senderId,
-                m.createdAt AS createdAt
+                m.createdAt AS createdAt,
+                m.type AS type
             FROM
                 Message m
             WHERE
@@ -36,6 +37,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
         Long getConversationId();
         Long getSenderId();
         LocalDateTime getCreatedAt();
-
+        MessageType getType();
     }
 }

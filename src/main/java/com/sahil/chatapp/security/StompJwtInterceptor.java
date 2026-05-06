@@ -3,7 +3,6 @@ package com.sahil.chatapp.security;
 import com.sahil.chatapp.model.StompPrincipal;
 import com.sahil.chatapp.service.JwtService;
 import io.jsonwebtoken.Claims;
-import org.jspecify.annotations.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageDeliveryException;
@@ -23,7 +22,7 @@ public class StompJwtInterceptor implements ChannelInterceptor {
     }
 
     @Override
-    public @Nullable Message<?> preSend(Message<?> message, MessageChannel channel) {
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String header = accessor.getFirstNativeHeader("Authorization");

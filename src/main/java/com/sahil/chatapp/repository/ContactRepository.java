@@ -1,6 +1,5 @@
 package com.sahil.chatapp.repository;
 
-import com.sahil.chatapp.dto.ContactResponse;
 import com.sahil.chatapp.model.Contact;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
