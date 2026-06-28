@@ -93,12 +93,11 @@ public class AuthService {
         try {
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
-            Path path = Paths.get("C:/Users/USER/Desktop/pictures/" + fileName);
+            Path path = Paths.get("/var/www/talksy/images/" + fileName);
 
-            Files.createDirectories(path.getParent());
             Files.write(path, file.getBytes());
 
-            return "/pictures/" + fileName;
+            return "/images/" + fileName;
 
         } catch (Exception e) {
             throw new RuntimeException("File upload failed");

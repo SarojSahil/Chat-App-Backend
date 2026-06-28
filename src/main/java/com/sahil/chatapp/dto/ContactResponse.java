@@ -1,6 +1,5 @@
 package com.sahil.chatapp.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 

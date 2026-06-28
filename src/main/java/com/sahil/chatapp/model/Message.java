@@ -1,9 +1,7 @@
 package com.sahil.chatapp.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.hibernate.query.sqm.tree.expression.Conversion;
 
 import java.time.LocalDateTime;
 

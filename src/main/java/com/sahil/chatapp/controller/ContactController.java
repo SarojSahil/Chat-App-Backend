@@ -7,7 +7,6 @@ import com.sahil.chatapp.dto.ContactUpdateRequest;
 import com.sahil.chatapp.model.User;
 import com.sahil.chatapp.service.ContactService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Null;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
